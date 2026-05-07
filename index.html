@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Free GitHub Site</title>
+</head>
+<body>
+    <h1>Welcome to my external site!</h1>
+    <p>If everything works, visiting this page should update Supabase immediately.</p>
+
+    <!-- Direct Supabase Tracker -->
+    <script>
+    (function() {
+      // 1. Enforce "1 person per device" forever using localStorage
+      if (localStorage.getItem('has_been_tracked')) return;
+
+      // 2. Your Supabase Credentials (Safe to expose if you used the RLS policies)
+      const SUPABASE_URL = 'https://zrfrzvqhxrynpaqofqwz.supabase.co';
+      const SUPABASE_ANON_KEY = 'sb_secret_CCG578zMWWuV1rUE1ILX0Q_-bnxOWJA';
+      
+      // Gets the current domain (e.g., 'yourname.github.io')
+      const websiteLink = window.location.hostname; 
+
+      const payload = {
+        WebsiteLink: websiteLink,
+        screen_width: window.innerWidth,
+        time_spent: 0,
+        max_scroll: 0,
+        clicked_elements: {}
+      };
+
+      // 3. Send directly to the Supabase Pageviews table
+      fetch(`${SUPABASE_URL}/rest/v1/Pageviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.ok) {
+          // 4. Mark user as tracked so we don't count them twice
+          localStorage.setItem('has_been_tracked', 'true');
+          console.log('Direct Supabase tracking successful.');
+        }
+      })
+      .catch(err => console.error('Tracking failed:', err));
+    })();
+    </script>
+</body>
+</html>
